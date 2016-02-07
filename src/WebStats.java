@@ -12,31 +12,28 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.Map.Entry;
 
 public class WebStats {
 
-
+   public static Map<String, Integer> tags = new HashMap<String, Integer>();
     public static void main(String[] args) {
 
-        Map<String, Integer> tags = new HashMap<String, Integer>();
+
         URL url;
         Scanner in = new Scanner(System.in);
         int count = 0, pageCount = 2, htmlCount = 0, headCount = 0, metaCount = 0,
                 titleCount = 0, linkCount = 0, divCount = 0, ulCount = 0, liCount = 0,
                 navCount = 0, pcount = 0;
 
-        System.out.println("Hello Test");
 
         Parser p = new Parser();
 
         String[] a = new String[40];
         Arrays.fill(a, "");
         a[0] = "http://www.scs.ryerson.ca/~cbyu";
+        //a[0] = "http://www.scs.ryerson.ca/~smsegal/simple.html";
 
-        String s = "<meta hello>";
-        s = s.substring(s.indexOf("<") + 1);
-        s= s.substring(0, s.indexOf(" "));
-        System.out.println(s);
 
         try {
             // get URL content
@@ -54,13 +51,19 @@ public class WebStats {
 
             while ((inputLine = br.readLine()) != null) {
                 // System.out.println(inputLine);
-                getAllTags(inputLine,tags);
+               String tagFinal = getAllTags(inputLine,tags);
+
+                //System.out.println(findLink(inputLine));
+
+
             }
             br.close();
-            System.out.print(a[1]);
 
-
-            System.out.println("Done");
+            //Iterate through map.
+            for (Map.Entry<String, Integer> entry : WebStats.tags.entrySet()) {
+                System.out.println("key is: " + entry.getKey() + " & the value is: " + entry.getValue());
+            }
+            
             System.out.println("There are " + count + " starting HTML tags on this page");
             System.out.println("There are " + divCount + " div tags on this page");
 
@@ -80,28 +83,29 @@ public class WebStats {
             if (inputLine.contains("<")) {
                 inputLine = inputLine.substring(inputLine.indexOf("<") + 1);
                 inputLine = inputLine.substring(0, inputLine.indexOf(">"));
-                if(inputLine.contains(" ")){
+                if (inputLine.contains(" ")) {
                     inputLine = inputLine.substring(0, inputLine.indexOf(" "));
                     //System.out.println(inputLine);
                 }
-                    if(inputLine.contains("/")){
-                        inputLine = inputLine.substring(1,inputLine.length());
-                    }
+                if (inputLine.contains("/")) {
+                    inputLine = inputLine.substring(1, inputLine.length());
+                }
+
+            if(!tags.containsKey(inputLine)){
                 tags.put(inputLine,1);
-                System.out.println(inputLine);
             }
+                else {
 
-            for(Object key : tags.keySet())
-            {
-                System.out.println(key + " : " +tags.get(key));
+                    tags.put(inputLine, (Integer)(tags.get(inputLine)) +1);
+                }
             }
-
         } catch (StringIndexOutOfBoundsException e) {
             //System.err.println("Unrecognized tag by my code");
         }
 
         return inputLine;
     }
+
 
     public static String findLink(String inputLine)
     {
